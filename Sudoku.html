@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sudoku</title>
+    <script src="../jquery.js"></script>
+    <style>
+        #Sudoku{
+            width: 436px;
+            margin: auto;
+        }
+        #Sudoku>div{
+            display: grid;
+            grid-template-columns: 100px 100px;
+            grid-gap: 3px;
+            background-color: black;
+            padding: 10px;
+        }
+        #box2,#box4{
+            float: right;
+        }
+        #Sudoku>div>input{
+            text-align: center;
+            padding: 20px 0;
+            font-size: 35px;
+            border: 0;
+        }
+        button{
+            font-size: 20px;
+            margin: 20px 20px;
+        }
+        h1{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="Sudoku">
+        <div id="box2">
+            <input type="text" class="row1 lign3">
+            <input type="text" class="row1 lign4">
+            <input type="text" class="row2 lign3">
+            <input type="text" class="row2 lign4">
+        </div>
+    
+        <div id="box1">
+            <input type="text" class="row1 lign1">
+            <input type="text" class="row1 lign2">
+            <input type="text" class="row2 lign1">
+            <input type="text" class="row2 lign2">
+        </div>
+
+        <div id="box4">
+            <input type="text" class="row3 lign3">
+            <input type="text" class="row3 lign4">
+            <input type="text" class="row4 lign3">
+            <input type="text" class="row4 lign4">
+        </div>
+
+        <div id="box3">
+            <input type="text" class="row3 lign1">
+            <input type="text" class="row3 lign2">
+            <input type="text" class="row4 lign1">
+            <input type="text" class="row4 lign2">
+        </div>
+
+        <button id="check">Check</button>
+        <button id="clear">Clear</button>
+        <button id="show">Show solution</button>
+
+        <h1><em></em></h1>
+    </div>
+    
+    <script>
+        function randomNumber(){
+            return Math.floor(Math.random()*4)+1;
+        }
+        $(document).ready(function(){
+            var box;
+            var row;
+            var lign;
+            var index=[];
+            var finish = [];
+            $("input").attr("disabled",true);
+            
+            for(let k = 1; k <= 4; k++) {
+                $("div#box"+k+" input").each(function(){
+                    //Get the current box values
+                    box = $("div#box"+k+" input").map(function(){
+                        return $(this).val();
+                    }).get();
+                    
+                    var tempRow = $(this)[0].classList[0];
+                    var tempLign = $(this)[0].classList[1];
+
+                    //Get the current row values
+                    row = $("input."+tempRow).map(function(){
+                        return $(this).val();
+                    }).get();
+
+                    //Get the current lign values
+                    lign = $("input."+tempLign).map(function(){
+                        return $(this).val();
+                    }).get();
+
+                    //Get new random number until it is not in the box or the row or the lign
+                    while(box.includes($(this).val()) || row.includes($(this).val()) || lign.includes($(this).val())){
+                        $(this).val(randomNumber());
+                    }
+                });
+            }
+
+            var solution = $("input").map(function(){
+                return $(this).val();
+            }).get();
+            console.log("solution : "+solution);
+            console.log("*********************");
+
+            //select random cells to empty between 2 and 3
+            for(let i = 1; i <= 4; i++) {
+                box = $("div#box"+i+" input").map(function(){
+                    return $(this).val();
+                }).get();
+                for(var j=0;j<3;j++){
+                    index[j] = box[j];
+                }
+                for(var m=0 ; m<index.length ; m++){
+                    for(var n=0 ; n<box.length ; n++){
+                        if(index[m] == n){
+                            $("div#box"+i+" input:nth-of-type("+n+")").val(0);
+                        }
+                    }
+                }
+            }
+            
+            //Empty the box with te value 0
+            $("input").each(function(){
+                if($(this).val() == 0){
+                    $(this).addClass("empty");
+                    $(this).val("");
+                }
+            });
+            $(".empty").attr("disabled",false);
+
+            //Button Check
+            $("#check").click(function(){
+                finish = $("input").map(function(){
+                    return $(this).val();
+                }).get();
+                if(JSON.stringify(solution) == JSON.stringify(finish)){
+                    $("em").html("Correct !").css("color","green");
+                }else{
+                    $("em").html("Something is wrong !").css("color","red");
+                }
+            });
+
+            //Button Clear
+            $("#clear").click(function(){
+                $("input:enabled").val("");
+                $("em").html("");
+            });
+            
+            //Button Show solution
+            $("#show").click(function(){
+                var a = 0;
+                $("input").each(function(){
+                    $(this).val(solution[a]);
+                    a++
+                });
+            });
+        });
+    </script>
+</body>
+</html>

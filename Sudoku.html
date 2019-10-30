@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,6 +11,7 @@
             width: 436px;
             margin: auto;
         }
+
         #Sudoku>div{
             display: grid;
             grid-template-columns: 100px 100px;
@@ -20,6 +21,9 @@
         }
         #box2,#box4{
             float: right;
+        }
+        div#box4,div#box3{
+            padding-top: 0;
         }
         #Sudoku>div>input{
             text-align: center;
@@ -74,6 +78,26 @@
     </div>
     
     <script>
+        var ranNums = shuffle([1,2,3,4]);
+
+        function shuffle(array) {
+            var i = array.length,
+                j = 0,
+                temp;
+
+            while (i--) {
+
+                j = Math.floor(Math.random() * (i+1));
+
+                // swap randomly chosen element with current element
+                temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+
+            }
+            return array;
+        }
+
         function randomNumber(){
             return Math.floor(Math.random()*4)+1;
         }
@@ -104,11 +128,28 @@
                     lign = $("input."+tempLign).map(function(){
                         return $(this).val();
                     }).get();
-
+                    
                     //Get new random number until it is not in the box or the row or the lign
-                    while(box.includes($(this).val()) || row.includes($(this).val()) || lign.includes($(this).val())){
+                    // 
+                    var count = 0;
+                    do{
                         $(this).val(randomNumber());
-                    }
+                        console.log(box.includes($(this).val()),row.includes($(this).val()),lign.includes($(this).val()),$(this).val(),count)
+                        count++;
+                        if(count>50){
+                            $("input").val("").attr("disabled",false);
+                            location.reload(true);
+                            throw new Error("Sudoku is corrupted : please reload!");
+                        }
+                    }while(box.includes($(this).val()) || row.includes($(this).val()) || lign.includes($(this).val()))
+                    // var gridS = $("input").map(function(){
+                    //     return $(this).val();
+                    // }).get();
+                    // console.log(gridS.includes("!?"))
+                    // if(gridS.includes("!?") == true){
+                    //     throw new Error("Sudoku is corrupted : please reload!");
+                    // }
+                    console.log("-----------------------------------------");
                 });
             }
 
